@@ -41,22 +41,22 @@ class FlightSearch(object):
 	def run(self):
 		browser.get(site_config['url'])
 		self.wait(1)
-		self.enter_tickettype_form(site_config['tickettype_xpath'][search_config['tickettype']])
+		self.enter_tickettype_form(site_config['xpath']['tickettype'][search_config['tickettype']])
 		self.wait(2)
-		self.enter_location_form(site_config['departure_xpath'], search_config['departure'])
+		self.enter_location_form(site_config['xpath']['departure'], search_config['departure'])
 		self.wait(1)
-		self.enter_location_form(site_config['destination_xpath'], search_config['destination'])
+		self.enter_location_form(site_config['xpath']['destination'], search_config['destination'])
 		self.wait(1)
-		self.enter_date_form(site_config['departure_date_xpath'], search_config['departure_date'])
+		self.enter_date_form(site_config['xpath']['departure_date'], search_config['departure_date'])
 		self.wait(2)
-		self.enter_date_form(site_config['return_date_xpath'], search_config['return_date'])
+		self.enter_date_form(site_config['xpath']['return_date'], search_config['return_date'])
 		self.wait(1)
-		self.enter_persons_form(site_config['persons_xpath'], search_config['persons'])
+		self.enter_persons_form(site_config['xpath']['persons'], search_config['persons'])
 		self.wait(0.8)
-		self.perform_search(site_config['search_button_xpath'])
+		self.perform_search(site_config['xpath']['search_button'])
 		time.sleep(20)
 		html_source = browser.page_source
-		self.search_results = self.gather_flight_information(html_source, site_config['flight_result_xpath'])
+		self.search_results = self.gather_flight_information(html_source, site_config['xpath']['flight_results'])
 		time.sleep(3)
 
 	def wait(self, maxTime):
@@ -145,48 +145,48 @@ class FlightSearch(object):
 		try:
 			result = []
 			doc = 	html.fromstring(html_source)
-			flights = doc.xpath(flight_result_xpath['flight_listing_xpath'])[0]
-			flight_list = flights.xpath(flight_result_xpath['flight_listing_iter_xpath'])
+			flights = doc.xpath(flight_result_xpath['flight_listing'])[0]
+			flight_list = flights.xpath(flight_result_xpath['flight_listing_item'])
 			
 			for flight in flight_list:
 
-				departure_time_element = flight.xpath(flight_result_xpath['departure_time_xpath'])
+				departure_time_element = flight.xpath(flight_result_xpath['departure_time'])
 				if len(departure_time_element) == 1:
 					departure_time = departure_time_element[0].text.strip()
 				else:
 					departure_time = 'n.a.'
 
-				arrival_time_element = flight.xpath(flight_result_xpath['arrival_time_xpath'])
+				arrival_time_element = flight.xpath(flight_result_xpath['arrival_time'])
 				if len(arrival_time_element) == 1:
 					arriaval_time = arrival_time_element[0].text.strip()
 				else:
 					arrival_time = 'n.a.'
 
-				day_shift_element = flight.xpath(flight_result_xpath['day_shift_xpath'])
+				day_shift_element = flight.xpath(flight_result_xpath['day_shift'])
 				if len(day_shift_element) == 1:
 					day_shift = day_shift_element[0].text.strip()
 				else:
 					day_shift = '0'
 
-				airline_element = flight.xpath(flight_result_xpath['airline_xpath'])
+				airline_element = flight.xpath(flight_result_xpath['airline'])
 				if len(airline_element) == 1:
 					airline = airline_element[0].text.strip()
 				else:
 					airline = 'n.a.'
 
-				duration_element = flight.xpath(flight_result_xpath['duration_xpath'])
+				duration_element = flight.xpath(flight_result_xpath['duration'])
 				if len(duration_element) == 1:
 					duration = duration_element[0].text.strip()
 				else:
 					duration = 'n.a.'
 
-				stopover_element = flight.xpath(flight_result_xpath['stopover_xpath'])
+				stopover_element = flight.xpath(flight_result_xpath['stopover'])
 				if len(stopover_element) == 1:
 					stopover = stopover_element[0].text.strip()
 				else:
 					stopover = 'n.a.'
 					
-				price_element = flight.xpath(flight_result_xpath['price_xpath'])
+				price_element = flight.xpath(flight_result_xpath['price'])
 				if len(price_element) == 1:
 					price = price_element[0].text.strip()
 				else:
@@ -209,55 +209,55 @@ if __name__ == '__main__':
 
 	site_config = {
 		'url': 'https://www.expedia.com/Flights',
-		'tickettype_xpath': {
-			'roundtrip' : "//label[@id='flight-type-roundtrip-label-flp']",
-			'oneway' : "//label[@id='flight-type-one-way-label-flp']",
-			'multistop' : "//label[@id='flight-type-multi-dest-label-flp']"
-		},
+		'xpath' : {
+			'tickettype' : {
+				'roundtrip' : "//label[@id='flight-type-roundtrip-label-flp']",
+				'oneway' : "//label[@id='flight-type-one-way-label-flp']",
+				'multistop' : "//label[@id='flight-type-multi-dest-label-flp']",
+			},
+			'departure': {
+				'form': "//input[@id='flight-origin-flp']",
+				'option_select' : "//a[@id='aria-option-0']",
+			},
+			'departure_date' : "//input[@id='flight-departing-flp']",
 
-		'departure_xpath' : {
-			'form': "//input[@id='flight-origin-flp']",
-			'option_select' : "//a[@id='aria-option-0']"
-		},
+			'destination': {
+				'form' : "//input[@id='flight-destination-flp']",
+				'option_select' : "//a[@id='aria-option-0']",
+			},
+			'return_date' : "//input[@id='flight-returning-flp']",
 
-		'destination_xpath' : {
-			'form' : "//input[@id='flight-destination-flp']",
-			'option_select' : "//a[@id='aria-option-0']"
-		},
+			'persons': {
+				'form' : "//div[@id='traveler-selector-flp']//button", #//button[@id='traveler-selector-flp']",
+				'adults' : "//div[@class='uitk-grid step-input-outside gcw-component gcw-component-step-input gcw-step-input gcw-component-initialized']",
+				'children' : "//div[@class='children-wrapper']",
+				'infants' : "//div[@class='infants-wrapper']",
+				'controls' : {
+					'incr_persons' : "//button[@class='uitk-step-input-button uitk-step-input-plus']",
+					'decr_persons' : "//button[@class='uitk-step-input-button uitk-step-input-minus']",
+					'persons_count' : "//div[@class='uitk-col all-col-shrink uitk-step-input-value-wrapper traveler-selector-traveler-field']//span[@class='uitk-step-input-value']",
+				}
 
-		'departure_date_xpath' : "//input[@id='flight-departing-flp']",
-		'return_date_xpath' : "//input[@id='flight-returning-flp']",
-		'persons_xpath' : {
-			'form' : "//div[@id='traveler-selector-flp']//button", #//button[@id='traveler-selector-flp']",
-			'adults' : "//div[@class='uitk-grid step-input-outside gcw-component gcw-component-step-input gcw-step-input gcw-component-initialized']",
-			'children' : "//div[@class='children-wrapper']",
-			'infants' : "//div[@class='infants-wrapper']",
-			'controls' : {
-				'incr_persons' : "//button[@class='uitk-step-input-button uitk-step-input-plus']",
-				'decr_persons' : "//button[@class='uitk-step-input-button uitk-step-input-minus']",
-				'persons_count' : "//div[@class='uitk-col all-col-shrink uitk-step-input-value-wrapper traveler-selector-traveler-field']//span[@class='uitk-step-input-value']"
-			}
+			},
+			'search_button': "//button[@class='btn-primary btn-action gcw-submit']",
+			'flight_results': {
+				'flight_listing' : "//div[@id='flight-listing-container']",
+				'flight_listing_item' : ".//div[@data-test-id='listing-main']",
+				'departure_time' : ".//span[@data-test-id='departure-time']",
+				'arrival_time' : ".//span[@data-test-id='arrival-time']",
+				'day_shift' : ".//span[@data-test-id='arrives-next-day']",
+				'airline' : ".//span[@data-test-id='airline-name']",
+				'duration' : ".//span[@data-test-id='duration']",
+				'stopover' : ".//span[@class='number-stops']",
+				'price' : ".//span[@data-test-id='listing-price-dollars']",
+			},
 		},
-
-		'search_button_xpath' : "//button[@class='btn-primary btn-action gcw-submit']",
-		
-		'flight_result_xpath' : {
-			'flight_listing_xpath' : "//div[@id='flight-listing-container']",
-			'flight_listing_iter_xpath' : ".//div[@data-test-id='listing-main']",	
-			'departure_time_xpath' : ".//span[@data-test-id='departure-time']",
-			'arrival_time_xpath' : ".//span[@data-test-id='arrival-time']",
-			'day_shift_xpath' : ".//span[@data-test-id='arrives-next-day']",
-			'airline_xpath' : ".//span[@data-test-id='airline-name']",
-			'duration_xpath' : ".//span[@data-test-id='duration']",
-			'stopover_xpath' : ".//span[@class='number-stops']",
-			'price_xpath' : ".//span[@data-test-id='listing-price-dollars']"
-		}
 	}
 
 	search_config = {
 		'tickettype': 'roundtrip',
-		'departure': "MUC",
-		'destination': "GDA",
+		'departure': "München",
+		'destination': "Gdansk",
 		'departure_date': "08/15/2019", # MM/DD/YYYY
 		'return_date': "08/24/2019", # MM/DD/YYYY
 		'persons' : { 
